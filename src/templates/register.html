@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Registration Completed!</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>Registration succeeds!</h1>
+    <h3>Goes back to main page in 3 seconds...</h3>
+  </body>
+
+  <script>
+    $(document).ready(function(){
+      console.log("Page loaded");
+      setTimeout(function(){
+        $.get("/", function(data){
+          console.log("Timeout reached");
+          document.open();
+          document.write(data);
+          document.close();
+        })
+      }, 3000);
+    });
+  </script>
+  </html>
