@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Video Upload Page</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>Video Upload</h1>
+
+    <div class="">
+        <form id="form" class="" action="/upload" method="post"  enctype=multipart/form-data onsubmit="event.preventDefault(); return final();">
+            <!-- <input type="file" accept="video/*"> -->
+            <!-- <input id="file" name="file" type="file" accept="video/*">    -->
+            <input id="file" name="file" type="file" accept="video/*">   <!-- IMG for testing purpose -->
+            <!-- <input type="text" name="what" value="1234"> -->
+            <input type="submit" value="Upload">
+        </form>
+        <!-- <button onclick=check_size()>Check Size</button> -->
+    </div>
+
+    <hr>
+    <div class="">
+        Note: </br>
+        &nbsp; &nbsp; &nbsp; &nbsp; Accepted video formats: mp4, avi (png for debugging only) </br>
+        &nbsp; &nbsp; &nbsp; &nbsp; Maximum file size acceptable: 100MB
+        &nbsp; &nbsp; &nbsp; &nbsp; Maximum video length acceptable: 1 minute
+    </div>
+    <br>
+
+    <pre id="infos"></pre>
+
+    <br>
+
+    <div class="" id="Feedback" style="color:red">
+        {{ feedback | safe }}
+    </div>
+
+  </body>
+
+  <script>
+    var myVideos = [];
+    var submission_indicator = 0;
+    // var LIMIT = 1000;
+
+    document.getElementById('file').onchange = setFileInfo;
+
+    //Add hidden form input for submitting extra information
+    // window.onload = function(){
+    //     var form = document.getElementById("form");
+    //     var input = document.createElement("input");
+    //     input.setAttribute("type", "hidden");
+    //     input.setAttribute("name", "Total_Chunk_Number");
+    //     input.setAttribute("value", "10");
+    //     form.appendChild(input);
+    //     console.log("LOG")
+    //     console.log(form);
+    // }
+
+    function setFileInfo() {
+        output = true;
+        if (check_size()){
+            var files = this.files;
+            console.log(files);
+            try{
+                console.log(files[0]);
+                myVideos.push(files[0]);
+            }
+            catch (e){
+                console.error("Exception thrown", e);
+            }
+            var video = document.createElement('video');
+            video.preload = 'metadata';
+
+            video.onloadedmetadata = function() {
+                var duration = video.duration;
+                myVideos[myVideos.length - 1].duration = duration;
+                // alert(duration + files[0].name)
+                updateInfos();
+                if (duration > 60){
+                    document.getElementById("Feedback").innerHTML = "The video is too long.";
+                    output = false;
+                    submission_indicator = 0;
+                }
+            }
+            try{
+                video.src = URL.createObjectURL(files[0]);
+            }
+            catch (e){
+                console.error("Exception thrown", e);
+                exit(1)
+            }
+        }
+        else{
+            output = false;
+            submission_indicator = 0;
+        }
+        submission_indicator = 1;
+        return output;
+    }
+
+
+    function updateInfos() {
+        var infos = document.getElementById('infos');
+        infos.textContent = "";
+        for (var i = 0; i < myVideos.length; i++) {
+          infos.textContent += myVideos[i].name + " duration: " + myVideos[i].duration + '\n';
+        }
+    }
+
+    function check_size(){
+        var file_input = document.getElementById("file");
+        try{
+            // alert(file_input.files[0].size); // Size returned in bytes.
+            if (file_input.files[0].size > 100 * 1024 * 1024){
+                document.getElementById("Feedback").innerHTML = "The file is too large!";
+                return false;
+            }
+            else{
+                document.getElementById("Feedback").innerHTML = "";
+                return 1;
+            }
+        }catch(e){
+            // alert("Error Detected");
+            console.log(e)
+            document.getElementById("Feedback").innerHTML = "Please choose a video to upload!";
+            return 0;
+        }
+    }
+
+    // function slice(file, start, end) {
+    //     var slice = file.mozSlice ? file.mozSlice :
+    //                 file.webkitSlice ? file.webkitSlice :
+    //                 file.slice ? file.slice : noop;
+    //
+    //     return slice.bind(file)(start, end);
+    // }
+    //
+    // function append_file(file, index){
+    //     var form = document.getElementById("file");
+    //     var child = document.createElement("input");
+    //     input.setAttribute("type", "file");
+    //     input.setAttribute("name", index);
+    //     input.setAttribute("value", file);
+    //     form.appendChild(child);
+    // }
+    //
+    // function chop_and_append(file, start, end){
+    //     var temp1 = slice(f, start, end);
+    //     append_file(temp1, index);
+    // }
+    //
+    // function chop_video(){
+    //     //TODO
+    //     var f = document.getElementById("file");
+    //     var size = ori.size;
+    //     var start = 0;
+    //     var end = start + size;
+    //
+    //     while(size > end){
+    //         chop_and_append(f, start, end);
+    //     }
+    //
+    //     end = size;
+    //     chop_loop(f, start, end);
+    //
+    // }
+
+    function final(){
+        if (submission_indicator){
+            document.getElementById("Feedback").innerHTML = "";
+            //Cut Video into chunks
+            // chop_video();
+
+            temp1 = document.getElementById("form");
+            temp2 = document.getElementById("file");
+            console.log(temp2.files)
+            // console.log(temp1)
+            // temp1.removeChild("")
+            temp1.submit();
+        }
+    }
+  </script>
+  </html>
