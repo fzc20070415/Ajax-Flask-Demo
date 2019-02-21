@@ -44,7 +44,7 @@ def upload():
 
         # Retrieve uploaded video
         print(request.form)
-        print(request.files)
+    # print(request.files)
         file_list = request.files.getlist("file")
         print(file_list)
         for item in file_list:
@@ -54,6 +54,7 @@ def upload():
                 print("ERROR:", sys.exc_info()[0])
                 return render_template('upload.html', feedback="No file is uploaded.")
 
+            print("User", request.form.getlist("email")[0], "sent a video", secure_filename(f.filename))
             basepath = os.path.dirname(__file__)
             if f and allowed_file(f.filename):
                 upload_path = os.path.join(basepath, "cache", secure_filename(f.filename))
